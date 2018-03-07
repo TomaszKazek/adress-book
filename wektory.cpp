@@ -10,6 +10,7 @@ using namespace std;
 struct Wpis
 {
     int ID;
+    int IDuzytkownika;
     string imie;
     string nazwisko;
     string adres;
@@ -17,66 +18,231 @@ struct Wpis
     string nrTelefonu;
 };
 
-void wczytajDane(vector<Wpis> &dane);
-void dodajRekord(vector<Wpis> &dane);
+struct Uzytkownik
+{
+    int ID;
+    string nazwa;
+    string haslo;
+};
+
+void wczytajUzytkownikow(vector<Uzytkownik> &uzytkownicy);
+int zaloguj(vector<Uzytkownik> uzytkownicy);
+void dodajUzytkownika(vector<Uzytkownik> &uzytkownicy);
+void zapiszUzytkownikaDoPliku(vector<Uzytkownik> uzytkownicy);
+
+void uruchomProgram(int IDuzytkownika);
+
+int wczytajDane(vector<Wpis> &dane, int IDuzytkownika);
+void dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID);
 void pokazCalaKsiazke(vector<Wpis> dane);
 void wypiszRekordyPoImieniu(vector<Wpis> dane);
 void wypiszRekordyPoNazwisku(vector<Wpis> dane);
 void zapiszDaneDoPliku(vector<Wpis> dane);
 void usunRekord (vector<Wpis> &dane);
-void edycjaRekordu (vector<Wpis> &dane);
+void edycjaRekordu (vector<Wpis> &dane, int IDuzytkownika);
+void usunRekordZPliku(int IDdoUsuniecia);
+void edycjaRekorduWPliku(int IDdoZmiany, string nowyRekord);
 
 int main()
 {
-    char opcja;
-    vector<Wpis> dane;
-    wczytajDane(dane);
+    vector<Uzytkownik> uzytkownicy;
+    wczytajUzytkownikow(uzytkownicy);
 
-    while(opcja!='7')
+    char opcja='0';
+    int IDuzytkownika=0;
+
+    while(opcja!='3')
     {
         system("cls");
-        cout<<"Ksiazka adresowa - menu glowne\n1. Wyszukaj po imieniu\n2. Wyszukaj po nazwisku\n3. Dodaj do kontaktow\n4. Edytuj kontakt\n5. Wyswietl wszystkie kontakty\n6. Usun kontakt\n7. Zakoncz program\n";
+        cout<<"Ksiazka adresowa - menu glowne\n1. Logowanie\n2. Rejestracja\n3. Zamknij program\n";
         opcja=getch();
         switch (opcja)
         {
         case '1':
-            wypiszRekordyPoImieniu(dane);
+            IDuzytkownika=zaloguj(uzytkownicy);
+            if (IDuzytkownika!=0)
+                uruchomProgram(IDuzytkownika);
             break;
         case '2':
-            wypiszRekordyPoNazwisku(dane);
+            dodajUzytkownika(uzytkownicy);
             break;
         case '3':
-            dodajRekord(dane);
-            break;
-        case '4':
-            edycjaRekordu(dane);
-            break;
-        case '5':
-            pokazCalaKsiazke (dane);
-            break;
-        case '6':
-            usunRekord (dane);
-            break;
-        case '7':
-            zapiszDaneDoPliku(dane);
             break;
         default:
             cout<<"Nie ma takiej opcji\n";
+            system("pause");
             break;
         }
     }
+}
+
+void wczytajUzytkownikow(vector<Uzytkownik> &uzytkownicy)
+{
+    uzytkownicy.clear();
+    fstream zarejestrowaniUzytkownicy;
+    string bufor;
+    zarejestrowaniUzytkownicy.open("Uzytkownicy.txt",ios::in);
+    if (zarejestrowaniUzytkownicy)
+    {
+        if(ifstream("Uzytkownicy.txt", ios::ate).tellg()!=0)
+        {
+            while (!(zarejestrowaniUzytkownicy.eof()))
+            {
+                Uzytkownik *w_uzytkownik=new Uzytkownik;
+                getline(zarejestrowaniUzytkownicy,bufor);
+                stringstream ss(bufor);
+                getline(ss,w_uzytkownik->nazwa,'|');//tymczasowo do konwersji na liczbêe
+                w_uzytkownik->ID=atoi(w_uzytkownik->nazwa.c_str());
+                getline(ss,w_uzytkownik->nazwa,'|');
+                getline(ss,w_uzytkownik->haslo,'|');
+                uzytkownicy.push_back(*w_uzytkownik);
+                delete w_uzytkownik;
+            }
+        }
+        zarejestrowaniUzytkownicy.close();
+    }
+}
+
+int zaloguj(vector<Uzytkownik> uzytkownicy)
+{
+    string nazwa, haslo;
+    cout<<"Podaj nazwe uzytkownika: ";
+    cin.sync();
+    getline(cin, nazwa);
+
+    vector<Uzytkownik>::iterator indeks=uzytkownicy.begin();
+
+    while (indeks!=uzytkownicy.end())
+    {
+        if (nazwa==indeks->nazwa)
+        {
+            for(int i=0;i<3;i++)
+            {
+                cout<<"Podaj haslo: ";
+                cin.sync();
+                getline(cin,haslo);
+            if (haslo==indeks->haslo)
+            {
+                system("cls");
+                cout<<"Witaj "<<indeks->nazwa<<endl;
+                system("pause");
+                return indeks->ID;
+            }
+            else
+                cout<<"Haslo niepoprawne\n";
+            }
+        }
+        indeks++;
+    }
+    system("cls");
+    cout<<"Proba logowania zakonczyla sie niepowodzeniem\n";
+    system("pause");
     return 0;
 }
 
-void wczytajDane(vector<Wpis> &dane)
+void dodajUzytkownika(vector<Uzytkownik> &uzytkownicy)
+{
+    string tekstTymczasowy;
+    vector<Uzytkownik>::iterator indeks=uzytkownicy.end();
+    Uzytkownik *w_uzytkownik=new Uzytkownik;
+
+    if (uzytkownicy.empty())
+    {
+        w_uzytkownik->ID=1;
+        cout<<"ID: "<<1<<endl;
+    }
+    if (!uzytkownicy.empty())
+    {
+        indeks--;
+        w_uzytkownik->ID=indeks->ID+1;
+        cout<<"ID: "<<w_uzytkownik->ID<<endl;
+    }
+    cout<<"Podaj nazwe: ";
+    cin.sync();
+    getline(cin, tekstTymczasowy);
+    w_uzytkownik->nazwa=tekstTymczasowy;
+    cout<<"Podaj haslo: ";
+    cin.sync();
+    getline(cin, tekstTymczasowy);
+    w_uzytkownik->haslo=tekstTymczasowy;
+
+    uzytkownicy.push_back(*w_uzytkownik);
+    delete w_uzytkownik;
+    system("pause");
+    zapiszUzytkownikaDoPliku(uzytkownicy);
+}
+
+void zapiszUzytkownikaDoPliku(vector<Uzytkownik> uzytkownicy)
+{
+    if (!uzytkownicy.empty())
+    {
+        vector<Uzytkownik>::iterator indeks=uzytkownicy.begin();
+        fstream zarejestrowaniUzytkownicy;
+        zarejestrowaniUzytkownicy.open("Uzytkownicy.txt",ios::out);
+        //ponizsze nie jest w petli, zeby nie zaczynac od endl
+        zarejestrowaniUzytkownicy<<indeks->ID<<"|"<<indeks->nazwa<<"|"<<indeks->haslo;
+        indeks++;
+        while (indeks!=uzytkownicy.end())
+        {
+            zarejestrowaniUzytkownicy<<endl<<indeks->ID<<"|"<<indeks->nazwa<<"|"<<indeks->haslo;
+            indeks++;
+        }
+        zarejestrowaniUzytkownicy.close();
+    }
+    else remove("Uzytkownicy.txt");
+}
+
+void uruchomProgram(int IDuzytkownika)
+{
+    char opcja='0';
+    vector<Wpis> dane;
+    int ostatnieID=wczytajDane(dane, IDuzytkownika);
+
+    while(opcja!='7')
+    {
+        system("cls");
+        cout<<"Ksiazka adresowa - menu glowne\n1. Dodaj adresata\n2. Wyszukaj po imieniu\n3. Wyszukaj po nazwisku\n4. Pokaz wszystkich adresatow\n5. Usun adresata\n6. Edytuj adresata\n7. Wyloguj sie\n";
+        opcja=getch();
+        switch (opcja)
+        {
+        case '1':
+            dodajRekord(dane, IDuzytkownika, ostatnieID);
+            break;
+        case '2':
+            wypiszRekordyPoImieniu(dane);
+            break;
+        case '3':
+            wypiszRekordyPoNazwisku(dane);
+            break;
+        case '4':
+            pokazCalaKsiazke (dane);
+            break;
+        case '5':
+            usunRekord (dane);
+            break;
+        case '6':
+            edycjaRekordu(dane, IDuzytkownika);
+            break;
+        case '7':
+            break;
+        default:
+            cout<<"Nie ma takiej opcji\n";
+            system("pause");
+            break;
+        }
+    }
+}
+
+int wczytajDane(vector<Wpis> &dane, int IDuzytkownika)
 {
     dane.clear();
     fstream kontakty;
     string linia;
-    kontakty.open("kontakty.txt",ios::in);
+    int ostatnieID=0;
+    kontakty.open("Adresaci.txt",ios::in);
     if (kontakty)
     {
-        if(ifstream("kontakty.txt", ios::ate).tellg()!=0)
+        if(ifstream("Adresaci.txt", ios::ate).tellg()!=0)
         {
             while (!(kontakty.eof()))
             {
@@ -85,81 +251,71 @@ void wczytajDane(vector<Wpis> &dane)
                 stringstream ss(linia);
                 getline(ss,w_rekord->imie,'|');//tymczasowo do konwersji na liczbêe
                 w_rekord->ID=atoi(w_rekord->imie.c_str());
+                getline(ss,w_rekord->imie,'|');//tymczasowo do konwersji na liczbêe
+                w_rekord->IDuzytkownika=atoi(w_rekord->imie.c_str());
                 getline(ss,w_rekord->imie,'|');
                 getline(ss,w_rekord->nazwisko,'|');
                 getline(ss,w_rekord->adres,'|');
                 getline(ss,w_rekord->email,'|');
                 getline(ss,w_rekord->nrTelefonu,'|');
+                ostatnieID=w_rekord->ID;
+                if (w_rekord->IDuzytkownika==IDuzytkownika)
                 dane.push_back(*w_rekord);
                 delete w_rekord;
             }
         }
         kontakty.close();
     }
+    return ostatnieID;
 }
 
-void pokazCalaKsiazke(vector<Wpis> dane)
-{
-    system("cls");
-    if (dane.empty())
-    {
-        cout<<"Ksiazka jest pusta\n\n";
-    }
-    else
-    {
-        vector<Wpis>::iterator indeks=dane.begin();
-
-        while (indeks!=dane.end())
-        {
-            cout<<indeks->ID<<endl;
-            cout<<indeks->imie<<endl;
-            cout<<indeks->nazwisko<<endl;
-            cout<<indeks->adres<<endl;
-            cout<<indeks->email<<endl;
-            cout<<indeks->nrTelefonu<<endl;
-            indeks++;
-        }
-    }
-    system("pause");
-}
-
-void dodajRekord(vector<Wpis> &dane)
+void dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID)
 {
     string tekstTymczasowy;
+    fstream kontakty;
+    kontakty.open("Adresaci.txt",ios::out|ios::app);
     vector<Wpis>::iterator indeks=dane.end();
     Wpis *w_rekord=new Wpis;
 
-    if (dane.empty())
-    {
-        w_rekord->ID=1;
-        cout<<"ID: "<<1<<endl;
-    }
-    if (!dane.empty())
-    {
-        indeks--;
-        w_rekord->ID=indeks->ID+1;
-        cout<<"ID: "<<w_rekord->ID<<endl;
-    }
+    if(ifstream("Adresaci.txt", ios::ate).tellg()!=0)
+        kontakty<<endl;
+
+    w_rekord->ID=ostatnieID+1;
+    kontakty<<w_rekord->ID<<"|";
+    cout<<"ID: "<<w_rekord->ID<<endl;
+
+    w_rekord->IDuzytkownika=IDuzytkownika;
+    kontakty<<w_rekord->IDuzytkownika<<"|";
+
     cout<<"Podaj imie: ";
     cin.sync();
     getline(cin, tekstTymczasowy);
     w_rekord->imie=tekstTymczasowy;
+    kontakty<<w_rekord->imie<<"|";
+
     cout<<"Podaj nazwisko: ";
     cin.sync();
     getline(cin, tekstTymczasowy);
     w_rekord->nazwisko=tekstTymczasowy;
+    kontakty<<w_rekord->nazwisko<<"|";
+
     cout<<"Podaj adres: ";
     cin.sync();
     getline(cin, tekstTymczasowy);
     w_rekord->adres=tekstTymczasowy;
+    kontakty<<w_rekord->adres<<"|";
+
     cout<<"Podaj email: ";
     cin.sync();
     getline(cin, tekstTymczasowy);
     w_rekord->email=tekstTymczasowy;
+    kontakty<<w_rekord->email<<"|";
+
     cout<<"Podaj nr telefonu: ";
     cin.sync();
     getline(cin, tekstTymczasowy);
     w_rekord->nrTelefonu=tekstTymczasowy;
+    kontakty<<w_rekord->nrTelefonu;
 
     dane.push_back(*w_rekord);
     delete w_rekord;
@@ -226,25 +382,31 @@ void wypiszRekordyPoNazwisku(vector<Wpis> dane)
     system("pause");
 }
 
-void zapiszDaneDoPliku(vector<Wpis> dane)
+void pokazCalaKsiazke(vector<Wpis> dane)
 {
-    if (!dane.empty())
+    system("cls");
+    if (dane.empty())
+    {
+        cout<<"Ksiazka jest pusta\n\n";
+    }
+    else
     {
         vector<Wpis>::iterator indeks=dane.begin();
-        fstream kontakty;
-        kontakty.open("kontakty.txt",ios::out);
-        //ponizsze nie jest w petli, zeby nie zaczynac od endl
-        kontakty<<indeks->ID<<"|"<<indeks->imie<<"|"<<indeks->nazwisko<<"|"<<indeks->adres<<"|"<<indeks->email<<"|"<<indeks->nrTelefonu;
-        indeks++;
+
         while (indeks!=dane.end())
         {
-            kontakty<<endl<<indeks->ID<<"|"<<indeks->imie<<"|"<<indeks->nazwisko<<"|"<<indeks->adres<<"|"<<indeks->email<<"|"<<indeks->nrTelefonu;
+            cout<<indeks->ID<<endl;
+            cout<<indeks->imie<<endl;
+            cout<<indeks->nazwisko<<endl;
+            cout<<indeks->adres<<endl;
+            cout<<indeks->email<<endl;
+            cout<<indeks->nrTelefonu<<endl;
             indeks++;
         }
-        kontakty.close();
     }
-    else remove("kontakty.txt");
+    system("pause");
 }
+
 
 void usunRekord (vector<Wpis> &dane)
 {
@@ -276,13 +438,41 @@ void usunRekord (vector<Wpis> &dane)
         }
         indeks++;
     }
+    usunRekordZPliku(IDdoUsuniecia);
 }
 
-void edycjaRekordu (vector<Wpis> &dane)
+void usunRekordZPliku(int IDdoUsuniecia)
+{
+    string tekstTymczasowy,IDzPliku;
+    fstream kontakty, noweKontakty;
+    kontakty.open("Adresaci.txt",ios::in);
+    noweKontakty.open("NowiAdresaci.txt",ios::out);
+
+    if (kontakty)
+    {
+    while (!(kontakty.eof()))
+    {
+    getline(kontakty,tekstTymczasowy);
+    stringstream ss(tekstTymczasowy);
+    getline(ss,IDzPliku,'|');
+    if (atoi(IDzPliku.c_str())!=IDdoUsuniecia)
+    {
+        noweKontakty<<tekstTymczasowy<<endl;
+    }
+    }
+    kontakty.close();
+    noweKontakty.close();
+    remove("Adresaci.txt");
+    rename("NowiAdresaci.txt","Adresaci.txt");
+    }
+}
+
+void edycjaRekordu (vector<Wpis> &dane, int IDuzytkownika)
 {
     vector<Wpis>::iterator indeks=dane.begin();
     int IDdoZmiany;
     char opcja;
+    string nowyRekord;
 
     cin.sync();
     cout<<"Podaj ID: ";
@@ -327,7 +517,45 @@ void edycjaRekordu (vector<Wpis> &dane)
                 system("pause");
                 break;
             }
+        stringstream ID;
+        ID<<indeks->ID;
+        nowyRekord=ID.str();
+        ID.str("");
+        ID<<IDuzytkownika;
+        nowyRekord=nowyRekord+"|"+ID.str()+"|"+indeks->imie+"|"+indeks->nazwisko+"|"+indeks->adres+"|"+indeks->email+"|"+indeks->nrTelefonu;
+        edycjaRekorduWPliku(IDdoZmiany, nowyRekord);
         }
         indeks++;
+    }
+}
+
+
+void edycjaRekorduWPliku(int IDdoZmiany, string nowyRekord)
+{
+    string tekstTymczasowy,IDzPliku;
+    fstream kontakty, noweKontakty;
+    kontakty.open("Adresaci.txt",ios::in);
+    noweKontakty.open("NowiAdresaci.txt",ios::out);
+
+    if (kontakty)
+    {
+    while (!(kontakty.eof()))
+    {
+    getline(kontakty,tekstTymczasowy);
+    stringstream ss(tekstTymczasowy);
+    getline(ss,IDzPliku,'|');
+    if (atoi(IDzPliku.c_str())==IDdoZmiany)
+    {
+        noweKontakty<<nowyRekord<<endl;
+    }
+    else
+    {
+        noweKontakty<<tekstTymczasowy<<endl;
+    }
+    }
+    kontakty.close();
+    noweKontakty.close();
+    remove("Adresaci.txt");
+    rename("NowiAdresaci.txt","Adresaci.txt");
     }
 }
