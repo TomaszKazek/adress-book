@@ -33,14 +33,14 @@ void zapiszUzytkownikaDoPliku(vector<Uzytkownik> uzytkownicy);
 void uruchomProgram(int IDuzytkownika);
 
 int wczytajDane(vector<Wpis> &dane, int IDuzytkownika);
-void dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID);
+int dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID);
 void pokazCalaKsiazke(vector<Wpis> dane);
 void wypiszRekordyPoImieniu(vector<Wpis> dane);
 void wypiszRekordyPoNazwisku(vector<Wpis> dane);
 void zapiszDaneDoPliku(vector<Wpis> dane);
-void usunRekord (vector<Wpis> &dane);
+int usunRekord (vector<Wpis> &dane, int ostatnieID);
 void edycjaRekordu (vector<Wpis> &dane, int IDuzytkownika);
-void usunRekordZPliku(int IDdoUsuniecia);
+void usunRekordZPliku(int IDdoUsuniecia, int ostatnieID);
 void edycjaRekorduWPliku(int IDdoZmiany, string nowyRekord);
 
 int main()
@@ -201,12 +201,13 @@ void uruchomProgram(int IDuzytkownika)
     while(opcja!='7')
     {
         system("cls");
+        cout<<ostatnieID<<endl;
         cout<<"Ksiazka adresowa - menu glowne\n1. Dodaj adresata\n2. Wyszukaj po imieniu\n3. Wyszukaj po nazwisku\n4. Pokaz wszystkich adresatow\n5. Usun adresata\n6. Edytuj adresata\n7. Wyloguj sie\n";
         opcja=getch();
         switch (opcja)
         {
         case '1':
-            dodajRekord(dane, IDuzytkownika, ostatnieID);
+            ostatnieID=dodajRekord(dane, IDuzytkownika, ostatnieID);
             break;
         case '2':
             wypiszRekordyPoImieniu(dane);
@@ -218,7 +219,7 @@ void uruchomProgram(int IDuzytkownika)
             pokazCalaKsiazke (dane);
             break;
         case '5':
-            usunRekord (dane);
+            ostatnieID=usunRekord (dane, ostatnieID);
             break;
         case '6':
             edycjaRekordu(dane, IDuzytkownika);
@@ -269,7 +270,7 @@ int wczytajDane(vector<Wpis> &dane, int IDuzytkownika)
     return ostatnieID;
 }
 
-void dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID)
+int dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID)
 {
     string tekstTymczasowy;
     fstream kontakty;
@@ -319,7 +320,9 @@ void dodajRekord(vector<Wpis> &dane, int IDuzytkownika, int ostatnieID)
 
     dane.push_back(*w_rekord);
     delete w_rekord;
+    kontakty.close();
     system("pause");
+    return ostatnieID+1;
 }
 
 void wypiszRekordyPoImieniu(vector<Wpis> dane)
@@ -408,7 +411,7 @@ void pokazCalaKsiazke(vector<Wpis> dane)
 }
 
 
-void usunRekord (vector<Wpis> &dane)
+int usunRekord (vector<Wpis> &dane, int ostatnieID)
 {
     vector<Wpis>::iterator indeks=dane.begin();
     int IDdoUsuniecia;
@@ -434,19 +437,24 @@ void usunRekord (vector<Wpis> &dane)
         if (potwierdzenie=='1')
         {
             dane.erase(indeks);
+            usunRekordZPliku(IDdoUsuniecia,ostatnieID);
             break;
         }
         indeks++;
     }
-    usunRekordZPliku(IDdoUsuniecia);
+    if (IDdoUsuniecia==ostatnieID)
+        return ostatnieID-1;
+    else
+        return ostatnieID;
 }
 
-void usunRekordZPliku(int IDdoUsuniecia)
+void usunRekordZPliku(int IDdoUsuniecia, int ostatnieID)
 {
     string tekstTymczasowy,IDzPliku;
     fstream kontakty, noweKontakty;
     kontakty.open("Adresaci.txt",ios::in);
     noweKontakty.open("NowiAdresaci.txt",ios::out);
+    bool pierwszyWiersz=true;
 
     if (kontakty)
     {
@@ -457,7 +465,13 @@ void usunRekordZPliku(int IDdoUsuniecia)
     getline(ss,IDzPliku,'|');
     if (atoi(IDzPliku.c_str())!=IDdoUsuniecia)
     {
-        noweKontakty<<tekstTymczasowy<<endl;
+        if (pierwszyWiersz==true)
+        {
+        noweKontakty<<tekstTymczasowy;
+        pierwszyWiersz=false;
+        }
+        else
+            noweKontakty<<endl<<tekstTymczasowy;
     }
     }
     kontakty.close();
