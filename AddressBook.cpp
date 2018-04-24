@@ -1,206 +1,14 @@
-#include "address_book.h"
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <fstream>
+#include <sstream>
 #include <cstdlib>
 #include <conio.h>
+#include "AddressBook.h"
 
 using namespace std;
 
-void Person::setUserID(int ID)
-{
-    userID=ID;
-}
-
-void Person::setName(string n)
-{
-    name=n;
-}
-
-int Person::getUserID()
-{
-    return userID;
-}
-
-string Person::getName()
-{
-    return name;
-}
-
-void User::setPassword(string p)
-    {
-password=p;
-    }
-
-    string User::getPassword()
-    {
-        return password;
-    }
-
-    void Record::setID(int id)
-    {
-        ID=id;
-    }
-
-    void Record::setLastName(string l)
-    {
-    lastName=l;
-    }
-
-    void Record::setAddress(string a)
-    {
-    address=a;
-    }
-
-    void Record::setEmail(string e)
-    {
-    email=e;
-    }
-
-    void Record::setPhone(string p)
-    {
-    phone=p;
-    }
-
-    int Record::getID()
-    {
-        return ID;
-    }
-
-    string Record::getLastName()
-    {
-        return lastName;
-    }
-
-    string Record::getAddress()
-    {
-        return address;
-    }
-
-    string Record::getEmail()
-    {
-        return email;
-    }
-
-    string Record::getPhone()
-    {
-        return phone;
-    }
-
-ListOfUsers::ListOfUsers()
-{
-    usersList.clear();
-    fstream existingUsers;
-    string buffer;
-    existingUsers.open("Users.txt",ios::in);
-    if (existingUsers)
-    {
-        if(ifstream("Users.txt", ios::ate).tellg()!=0)
-        {
-            while (!(existingUsers.eof()))
-            {
-                User *p_User = new User;
-                getline(existingUsers,buffer);
-                stringstream ss(buffer);
-                getline(ss,buffer,'|');
-                p_User->setUserID(atoi(buffer.c_str()));
-                getline(ss,buffer,'|');
-                p_User->setName(buffer);
-                getline(ss,buffer,'|');
-                p_User->setPassword(buffer);
-                usersList.push_back(*p_User);
-                lastUserID=p_User->getUserID();
-                delete p_User;
-            }
-        }
-        existingUsers.close();
-    }
-    }
-
-int ListOfUsers::logging()
-{
-    string name, password;
-    cout<<"Podaj nazwe uzytkownika: ";
-    cin.sync();
-    getline(cin, name);
-
-    vector<User>::iterator index=usersList.begin();
-
-    while (index!=usersList.end())
-    {
-        if (name==index->getName())
-        {
-            for(int i=0;i<3;i++)
-            {
-                cout<<"Podaj haslo: ";
-                cin.sync();
-                getline(cin,password);
-            if (password==index->getPassword())
-            {
-                system("cls");
-                cout<<"Witaj "<<index->getName()<<endl;
-                system("pause");
-                return index->getUserID();
-            }
-            else
-                cout<<"Haslo niepoprawne\n";
-            }
-        }
-        index++;
-    }
-    system("cls");
-    cout<<"Proba logowania zakonczyla sie niepowodzeniem\n";
-    system("pause");
-    return 0;
-}
-
-string ListOfUsers::addUser()
-{
-    string newUser, buffer;
-    stringstream ss;
-    vector<User>::iterator index=usersList.end();
-    User *p_user=new User;
-
-    p_user->setUserID(lastUserID+1);
-    ss<<p_user->getUserID();
-    newUser=ss.str();
-    newUser+="|";
-    cout<<"ID: "<<p_user->getUserID()<<endl;
-
-    cout<<"Podaj nazwe: ";
-    cin.sync();
-    getline(cin, buffer);
-    p_user->setName(buffer);
-    newUser+=p_user->getName()+"|";
-
-    cout<<"Podaj haslo: ";
-    cin.sync();
-    getline(cin, buffer);
-    p_user->setPassword(buffer);
-    newUser+=p_user->getPassword();
-
-    usersList.push_back(*p_user);
-    delete p_user;
-    system("pause");
-    return newUser;
-}
-
-vector<User> ListOfUsers::getUsersList()
-{
-    return usersList;
-}
-
-int ListOfUsers::getUserID()
-{
-    return userID;
-}
-void ListOfUsers::setUserID(int u)
-{
-    userID=u;
-}
-
-ListOfRecords::ListOfRecords(int userID)
+AddressBook::AddressBook(int userID)
 {
     recordsList.clear();
     fstream contacts;
@@ -241,12 +49,12 @@ ListOfRecords::ListOfRecords(int userID)
     }
 }
 
-int ListOfRecords::getLastID()
+int AddressBook::getLastID()
 {
     return lastID;
 }
 
-string ListOfRecords::addRecord(int userID)
+string AddressBook::addRecord(int userID)
 {
     string newRecord, buffer;
     stringstream ss;
@@ -254,6 +62,7 @@ string ListOfRecords::addRecord(int userID)
     Record *p_record=new Record;
 
     p_record->setID(lastID+1);
+    lastID+=1;
     ss<<p_record->getID();
     newRecord=ss.str();
     newRecord+="|";
@@ -301,7 +110,7 @@ string ListOfRecords::addRecord(int userID)
     return newRecord;
 }
 
-void ListOfRecords::showAllRecords()
+void AddressBook::showAllRecords()
 {
     system("cls");
     if (recordsList.empty())
@@ -326,7 +135,7 @@ void ListOfRecords::showAllRecords()
     system("pause");
 }
 
-void ListOfRecords::findByName()
+void AddressBook::findByName()
 {
     system("cls");
     string name;
@@ -356,7 +165,7 @@ void ListOfRecords::findByName()
     system("pause");
 }
 
-void ListOfRecords::findByLastName()
+void AddressBook::findByLastName()
 {
     system("cls");
     string lastName;
@@ -386,7 +195,7 @@ void ListOfRecords::findByLastName()
     system("pause");
 }
 
-int ListOfRecords::deleteRecord()
+int AddressBook::deleteRecord()
 {
     vector<Record>::iterator index=recordsList.begin();
     int IDtoDelete;
@@ -423,7 +232,7 @@ int ListOfRecords::deleteRecord()
     return IDtoDelete;
 }
 
-string ListOfRecords::editRecord(int userID)
+string AddressBook::editRecord(int userID)
 {
     vector<Record>::iterator index=recordsList.begin();
     int IDtoChange;
@@ -489,91 +298,4 @@ string ListOfRecords::editRecord(int userID)
         index++;
     }
     return newRecord;
-}
-
-void FileData::addRecord(string RecordToAdd)
-{
-    contacts.open("Data.txt",ios::out|ios::app);
-    if(ifstream("Data.txt", ios::ate).tellg()!=0)
-        contacts<<endl;
-
-        contacts<<RecordToAdd;
-
-    contacts.close();
-}
-
-void FileData::editRecord(string RecordToEdit)
-{
-    string buffer,ID,IDtoChange;
-    fstream contacts, newContacts;
-    contacts.open("Data.txt",ios::in);
-    newContacts.open("NewData.txt",ios::out);
-
-    if (contacts)
-    {
-    while (!(contacts.eof()))
-    {
-    getline(contacts,buffer);
-    stringstream ss(buffer);
-    getline(ss,ID,'|');
-    ss.str(RecordToEdit);
-    getline(ss,IDtoChange,'|');
-    if (ID==IDtoChange)
-    {
-        newContacts<<RecordToEdit<<endl;
-    }
-    else
-    {
-        newContacts<<buffer<<endl;
-    }
-    }
-    contacts.close();
-    newContacts.close();
-    remove("Data.txt");
-    rename("NewData.txt","Data.txt");
-    }
-}
-
-void FileData::deleteRecord(int IDtoDelete)
-{
-    string buffer,ID;
-    fstream contacts, newContacts;
-    contacts.open("Data.txt",ios::in);
-    newContacts.open("NewData.txt",ios::out);
-    bool firstRow=true;
-
-    if (contacts)
-    {
-    while (!(contacts.eof()))
-    {
-    getline(contacts,buffer);
-    stringstream ss(buffer);
-    getline(ss,ID,'|');
-    if (atoi(ID.c_str())!=IDtoDelete)
-    {
-        if (firstRow==true)
-        {
-        newContacts<<buffer;
-        firstRow=false;
-        }
-        else
-            newContacts<<endl<<buffer;
-    }
-    }
-    contacts.close();
-    newContacts.close();
-    remove("Data.txt");
-    rename("NewData.txt","Data.txt");
-    }
-}
-
-void FileUsers::addUser(string newUser)
-{
-    users.open("Users.txt",ios::out|ios::app);
-    if(ifstream("Users.txt", ios::ate).tellg()!=0)
-        users<<endl;
-
-        users<<newUser;
-
-    users.close();
 }
