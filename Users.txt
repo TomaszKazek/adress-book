@@ -2,5 +2,4 @@
 2|jola|jola2
 3|zenek|zenek3
 4|ewi|ewi4
-5|gupek|gupek5
-6|maniek|maniek6
+5|maniek|maniek5

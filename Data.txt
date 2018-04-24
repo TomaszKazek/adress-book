@@ -3,5 +3,3 @@
 3|1|Celina|Czajka|ul. Cedrowa 3|celina@domena.pl|764597687
 4|2|Darek|Drzewiecki|ul. Debowa 4|darek@domena.pl|57333867
 5|2|Ela|Elbanowska|ul. Eukalpitusowa 5|ela@domena.pl|032 4536575674
-6|1|Q|w|e|r|t
-7|6|Q|W|E|R|T

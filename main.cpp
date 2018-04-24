@@ -1,15 +1,21 @@
 #include <iostream>
-#include "address_book.h"
 #include <cstdlib>
 #include <conio.h>
+#include "AddressBook.h"
+#include "FileData.h"
+#include "FileUsers.h"
+#include "Person.h"
+#include "Record.h"
+#include "User.h"
+#include "Users.h"
 
 using namespace std;
 
-void mainMenu(ListOfRecords &listR, int userID);
+void mainMenu(AddressBook &listR, int userID);
 
 int main()
 {
-    ListOfUsers listU;
+    Users listU;
 
     char option='0';
 
@@ -25,7 +31,7 @@ int main()
             listU.setUserID(listU.logging());
             if(listU.getUserID()!=0)
             {
-            ListOfRecords *p_listR=new ListOfRecords (listU.getUserID());
+            AddressBook *p_listR=new AddressBook (listU.getUserID());
             mainMenu(*p_listR, listU.getUserID());
             delete p_listR;
             }
@@ -48,7 +54,7 @@ int main()
     }
 }
 
-void mainMenu(ListOfRecords &listR, int UserID)
+void mainMenu(AddressBook &listR, int UserID)
 {
     char opcja='0';
 
