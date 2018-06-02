@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>360</x>
+      <y>10</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>IDiImie
+--
+-IDuzytkownika: int
+-imie: string
+--
++getIDuzytkownika: int
++setImie: void
++getImie: string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>180</x>
+      <y>290</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Uzytkownik
+--
+-haslo: string
+--
++Uzytkownik:
++setPassword: void
++getPassword: string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>510</x>
+      <y>290</y>
+      <w>210</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>Wpis
+--
+-ID: int
+-nazwisko: string
+-adres: string
+-email: string
+-nrTelefonu: string
+--
++Wpis:
++getID: int
++setNazwisko: void
++getNazwisko: string
++setAdres: void
++getAdres: string
++setEmail:void
++getEmail: string
++setNrTelefonu: void
++setNrTelefonu: string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>70</x>
+      <y>60</y>
+      <w>210</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>listaUzytkownikow
+--
+-indeks: iterator
+--
++listaUzytkownikow:
++dodajUzytkownika: void
++zaloguj: int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>190</y>
+      <w>60</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>40.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>190</y>
+      <w>60</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>40</y>
+      <w>210</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>listaWpisow
+--
+-ostatnieID: int
+-indeks: iterator
+--
++listaWpisow:
++wypiszCalaKsiazke: void
++wyszukajPoImieniu: void
++wyszukajPoNazwisku: void
++usunRekord: int
++edytujRekord: void
++dodajRekord: int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>220</x>
+      <y>180</y>
+      <w>40</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;20.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>190</y>
+      <w>50</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>30.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>240</x>
+      <y>240</y>
+      <w>40</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>0...n</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>700</x>
+      <y>250</y>
+      <w>40</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>0...n</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
